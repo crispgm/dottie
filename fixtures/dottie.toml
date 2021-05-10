@@ -1,0 +1,9 @@
+name = "dottie_example"
+repo = "git@github.com:crispgm/dottie.git"
+
+[[dotfiles]]
+name = "nvim"
+src = "./nvim"
+target = "~/.config/nvim"
+dt = "Dir"
+symlinked = false
