@@ -1,4 +1,5 @@
 name = "dottie_example"
+description = "Example dottie.toml"
 repo = "git@github.com:crispgm/dottie.git"
 
 [[dotfiles]]

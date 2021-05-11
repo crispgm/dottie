@@ -1,17 +1,17 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use std::error::Error;
 use std::fmt;
 use std::fs::read_to_string;
 use std::path::Path;
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DotType {
     File,
     Dir,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DotItem {
     pub name: String,
 
@@ -25,7 +25,7 @@ pub struct DotItem {
     pub symlinked: Option<bool>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Config {
     pub name: String,
     pub repo: Option<String>,
@@ -46,14 +46,6 @@ impl fmt::Display for ConfigNotExisted {
 impl Error for ConfigNotExisted {}
 
 impl Config {
-    // pub fn new(name: String, repo: String, items: Vec<DotItem>) -> Config {
-    //     Config {
-    //         name,
-    //         repo,
-    //         dotfiles: items,
-    //     }
-    // }
-
     // load from `dottie.toml`
     // TODO: support custom file path
     pub fn from_toml(path: String) -> Result<Config, Box<dyn Error>> {
@@ -68,8 +60,6 @@ impl Config {
     }
 
     // filter with things like os, etc.
-
-    // impl iterator for items
 }
 
 #[test]
