@@ -18,11 +18,7 @@ impl Command for ListOpt {
         println!("Listing repository => {}", self.path);
 
         let cfg = Config::from_toml(self.path.clone()).unwrap();
-        if cfg.description.is_some() {
-            println!("Name: {} ({})", cfg.name, cfg.description.unwrap());
-        } else {
-            println!("Name: {}", cfg.name);
-        }
+        println!("{}", cfg.brief());
         for item in cfg.dotfiles.unwrap().iter() {
             println!("\t- {}", item.name);
         }

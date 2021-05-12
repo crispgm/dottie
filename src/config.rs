@@ -59,20 +59,50 @@ impl Config {
         Ok(cfg)
     }
 
-    // filter with things like os, etc.
+    pub fn brief(&self) -> String {
+        if self.description.is_some() {
+            format!(
+                "Name: {} ({})",
+                self.name,
+                self.description.clone().unwrap()
+            )
+        } else {
+            format!("Name: {}", self.name)
+        }
+    }
+
+    pub fn get_by_name(self, name: String) -> Option<DotItem> {
+        for item in self.dotfiles.unwrap().iter() {
+            if item.name == name {
+                return Some(item.clone());
+            }
+        }
+        None
+    }
 }
 
-#[test]
-fn load_toml_not_exists() {
-    let e = Config::from_toml(String::from("/some/path/not/exists"))
-        .unwrap_err()
-        .to_string();
-    assert_eq!(e.starts_with("Config is not existed"), true)
-}
+#[cfg(test)]
+mod test {
+    use crate::config::Config;
 
-#[test]
-fn load_from_toml() {
-    let result = Config::from_toml(String::from("./fixtures/dottie.toml")).unwrap();
-    assert_eq!(result.name, "dottie_example");
-    assert_eq!(result.repo.unwrap(), "git@github.com:crispgm/dottie.git");
+    #[test]
+    fn load_toml_not_exists() {
+        let e = Config::from_toml(String::from("/some/path/not/exists"))
+            .unwrap_err()
+            .to_string();
+        assert_eq!(e.starts_with("Config is not existed"), true)
+    }
+
+    #[test]
+    fn load_from_toml() {
+        let result = Config::from_toml(String::from("./fixtures/dottie.toml")).unwrap();
+        assert_eq!(
+            result.clone().brief(),
+            "Name: dottie_example (Example dottie.toml)"
+        );
+        let item = result.clone().get_by_name("nvim".to_string()).unwrap();
+        assert_eq!(item.name, "nvim");
+        assert_eq!(result.name, "dottie_example");
+        assert_eq!(result.repo.unwrap(), "git@github.com:crispgm/dottie.git");
+    }
 }

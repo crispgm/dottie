@@ -18,6 +18,15 @@ pub fn run() {
             println!("Running command on {} failed: {}", "ls", e)
         }
     }
+    // info
+    if let Some(ref matches) = matches.subcommand_matches("info") {
+        let cwd = get_cwd();
+        let path = format!("{}/fixtures/dottie.toml", cwd);
+        let name = matches.value_of("NAME").unwrap_or("");
+        if let Err(e) = info::InfoOpt::new(path, name.to_string()).run() {
+            println!("Running command on {} failed: {}", "info", e)
+        }
+    }
     // init
     if let Some(ref matches) = matches.subcommand_matches("init") {
         let git_repo = matches.value_of("git").unwrap_or("");
@@ -78,7 +87,7 @@ fn init_app() -> App<'static> {
         )
         .subcommand(
             App::new("unlink")
-                .about("Unlink a dotfile from repository")
+                .about("Unlink a dotfile from current repository")
                 .arg(
                     Arg::new("NAME")
                         .about("Given a dotfile name")
@@ -88,8 +97,8 @@ fn init_app() -> App<'static> {
                 ),
         )
         .subcommand(
-            App::new("cd")
-                .about("Change directory to where the dotfile locates")
+            App::new("info")
+                .about("Show a dotfile detail from current repository")
                 .arg(
                     Arg::new("NAME")
                         .about("Given a dotfile name")
