@@ -2,6 +2,7 @@ use std::error::Error;
 
 use crate::commands::Command;
 use crate::config::Config;
+use crate::{show_error, show_info};
 
 pub struct InfoOpt {
     path: String,
@@ -16,20 +17,20 @@ impl InfoOpt {
 
 impl Command for InfoOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        println!("Show info => {}", self.name);
+        show_info!("Show info => {}", self.name);
         let cfg = Config::from_toml(self.path.clone()).unwrap();
         let item = cfg.get_by_name(self.name.to_string());
         match item {
             Some(di) => {
                 if di.symlinked.is_some() && di.symlinked.unwrap() {
-                    println!("{} ✅", di.name);
+                    show_info!("{} ✅", di.name);
                 } else {
-                    println!("{}", di.name);
+                    show_info!("{}", di.name);
                 }
-                println!("Source: {}", di.src);
-                println!("Target: {}", di.target);
+                show_info!("Source: {}", di.src);
+                show_info!("Target: {}", di.target);
             }
-            None => eprintln!("Dotfile `{}` not found", self.name),
+            None => show_error!("Dotfile `{}` not found", self.name),
         }
         Ok(())
     }

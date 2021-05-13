@@ -1,10 +1,10 @@
-extern crate clap;
-
 use std::env;
 
+extern crate clap;
 use clap::{App, Arg};
 
 use crate::commands::*;
+use crate::show_error;
 
 pub fn run() {
     let app = init_app();
@@ -15,7 +15,7 @@ pub fn run() {
         let cwd = get_cwd();
         let path = format!("{}/dottie.toml", cwd);
         if let Err(e) = ls::ListOpt::new(path).run() {
-            println!("Running command on {} failed: {}", "ls", e)
+            show_error!("Running command on {} failed: {}", "ls", e)
         }
     }
     // info
@@ -24,7 +24,7 @@ pub fn run() {
         let path = format!("{}/fixtures/dottie.toml", cwd);
         let name = matches.value_of("NAME").unwrap_or("");
         if let Err(e) = info::InfoOpt::new(path, name.to_string()).run() {
-            println!("Running command on {} failed: {}", "info", e)
+            show_error!("Running command on {} failed: {}", "info", e)
         }
     }
     // init
@@ -32,7 +32,7 @@ pub fn run() {
         let git_repo = matches.value_of("git").unwrap_or("");
         let init_opt = init::InitOpt::new(git_repo.to_string());
         if let Err(e) = init_opt.run() {
-            println!("Running command on {} failed: {}", "init", e)
+            show_error!("Running command on {} failed: {}", "init", e)
         }
     }
 }
@@ -44,9 +44,7 @@ fn init_app() -> App<'static> {
         .arg(
             Arg::new("v")
                 .about("Sets the level of verbosity")
-                .short('v')
-                .multiple(true)
-                .takes_value(true),
+                .short('v'),
         )
         .subcommand(
             App::new("clone")

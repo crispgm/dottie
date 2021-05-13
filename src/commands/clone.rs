@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use crate::commands::Command;
+use crate::show_info;
 
 pub struct CloneOpt {
     git: String,
@@ -14,7 +15,7 @@ impl CloneOpt {
 
 impl Command for CloneOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        println!("Cloning repository => {}", self.git);
+        show_info!("Cloning repository => {}", self.git);
         Ok(())
     }
 }

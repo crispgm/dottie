@@ -50,7 +50,6 @@ impl Config {
     // TODO: support custom file path
     pub fn from_toml(path: String) -> Result<Config, Box<dyn Error>> {
         if !Path::new(&path).exists() {
-            eprintln!("ConfigNotExisted error: `{}` not exists", path);
             return Err(Box::new(ConfigNotExisted));
         }
 

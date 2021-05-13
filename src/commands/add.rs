@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use crate::commands::Command;
+use crate::show_info;
 
 pub struct AddOpt {
     name: String,
@@ -14,7 +15,7 @@ impl AddOpt {
 
 impl Command for AddOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        println!("Adding directory => {}", self.name);
+        show_info!("Adding directory => {}", self.name);
         Ok(())
     }
 }

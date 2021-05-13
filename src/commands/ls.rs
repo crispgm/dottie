@@ -1,7 +1,9 @@
 use std::error::Error;
+use std::process;
 
 use crate::commands::Command;
 use crate::config::Config;
+use crate::{show_error, show_info};
 
 pub struct ListOpt {
     path: String,
@@ -15,14 +17,17 @@ impl ListOpt {
 
 impl Command for ListOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        println!("Listing repository => {}", self.path);
+        show_info!("Listing repository => {}", self.path);
 
-        let cfg = Config::from_toml(self.path.clone()).unwrap();
-        println!("{}", cfg.brief());
+        let cfg = Config::from_toml(self.path.clone()).unwrap_or_else(|err| {
+            show_error!("{}", err);
+            process::exit(1);
+        });
+
+        show_info!("{}", cfg.brief());
         for item in cfg.dotfiles.unwrap().iter() {
-            println!("\t- {}", item.name);
+            show_info!("\t- {}", item.name);
         }
-
         Ok(())
     }
 }

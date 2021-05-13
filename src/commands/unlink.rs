@@ -1,6 +1,7 @@
 use std::error::Error;
 
 use crate::commands::Command;
+use crate::show_info;
 
 pub struct UnlinkOpt {
     name: String,
@@ -14,7 +15,7 @@ impl UnlinkOpt {
 
 impl Command for UnlinkOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        println!("Unlinking => {}", self.name);
+        show_info!("Unlinking => {}", self.name);
         Ok(())
     }
 }
