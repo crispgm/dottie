@@ -20,8 +20,6 @@ pub struct DotItem {
     pub src: String,
     pub target: String,
 
-    pub os: Option<String>, // respect std::env::consts::OS
-
     pub symlinked: Option<bool>,
 }
 

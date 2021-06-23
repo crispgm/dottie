@@ -29,8 +29,6 @@ impl Command for AddOpt {
             src: self.path.clone(),
             target: self.path.clone(), // TODO: expand source and target
             dot_type: DotType::File,
-            // TODO: add os
-            os: None,
             symlinked: None,
         };
         let is_dir = self.is_dir();
