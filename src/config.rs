@@ -47,7 +47,6 @@ impl Error for ConfigNotExisted {}
 
 impl Config {
     // load from `dottie.toml`
-    // TODO: support custom file path
     pub fn from_toml(path: String) -> Result<Config, Box<dyn Error>> {
         if !Path::new(&path).exists() {
             return Err(Box::new(ConfigNotExisted));

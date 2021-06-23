@@ -35,6 +35,15 @@ pub fn run() {
             show_error!("Running command on {} failed: {}", "init", e)
         }
     }
+    // add
+    if let Some(ref matches) = matches.subcommand_matches("add") {
+        let name = matches.value_of("name").unwrap_or("");
+        let path = matches.value_of("PATH").unwrap_or("");
+        let add_opt = add::AddOpt::new(name.to_string(), path.to_string());
+        if let Err(e) = add_opt.run() {
+            show_error!("Running command on {} failed: {}", "add", e)
+        }
+    }
 }
 
 fn init_app() -> App<'static> {
