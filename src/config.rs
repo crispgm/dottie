@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;
 use std::fs::read_to_string;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub enum DotType {
@@ -17,8 +17,8 @@ pub struct DotItem {
 
     #[serde(rename = "dt")]
     pub dot_type: DotType,
-    pub src: String,
-    pub target: String,
+    pub src: PathBuf,
+    pub target: PathBuf,
 
     pub symlinked: Option<bool>,
 }

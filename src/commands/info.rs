@@ -27,10 +27,13 @@ impl Command for InfoOpt {
                 } else {
                     show_info!("{}", di.name);
                 }
-                show_info!("Source: {}", di.src);
-                show_info!("Target: {}", di.target);
+                show_info!("Source: {}", di.src.into_os_string().into_string().unwrap());
+                show_info!(
+                    "Target: {}",
+                    di.target.into_os_string().into_string().unwrap()
+                );
             }
-            None => show_error!("Dotfile `{}` not found", self.name),
+            None => show_error!("Dottie file `{}` not found", self.name),
         }
         Ok(())
     }

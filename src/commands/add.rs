@@ -1,5 +1,6 @@
 use std::error::Error;
 use std::fs::metadata;
+use std::path::PathBuf;
 
 use crate::commands::Command;
 use crate::config::{DotItem, DotType};
@@ -26,8 +27,8 @@ impl Command for AddOpt {
         // TODO: if name is "", then what to use?
         let mut item = DotItem {
             name: self.name.clone(),
-            src: self.path.clone(),
-            target: self.path.clone(), // TODO: expand source and target
+            src: PathBuf::from(self.path.clone()),
+            target: PathBuf::from(self.path.clone()), // TODO: expand source and target
             dot_type: DotType::File,
             symlinked: None,
         };
