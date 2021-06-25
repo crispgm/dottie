@@ -4,6 +4,8 @@
 
 dottie is yet another `.dotfiles` manager written in Rust.
 
+Notice: dottie is under ACTIVE DEVELOPMENT and not ready for production.
+
 ## Concept
 
 dottie provides easy approach to import dotfiles anywhere to your dotfiles project,
