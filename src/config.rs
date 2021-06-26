@@ -31,7 +31,6 @@ pub struct Config {
     pub dotfiles: Option<Vec<DotItem>>,
 }
 
-/// ConfigNotExisted error for loading toml file
 #[derive(Debug, Clone)]
 pub struct ConfigNotExisted;
 
@@ -67,19 +66,39 @@ impl Config {
         }
     }
 
-    pub fn get_by_name(self, name: String) -> Option<DotItem> {
-        for item in self.dotfiles.unwrap().iter() {
-            if item.name == name {
-                return Some(item.clone());
+    pub fn get_by_name(&self, name: String) -> Option<DotItem> {
+        match self.dotfiles.clone() {
+            Some(dotfiles) => {
+                for item in dotfiles {
+                    if item.name == name {
+                        return Some(item);
+                    }
+                }
             }
+            None => (),
         }
         None
+    }
+
+    pub fn is_dottied(&self, src: PathBuf) -> bool {
+        match self.dotfiles.clone() {
+            Some(dotfiles) => {
+                for item in dotfiles {
+                    if item.src == src {
+                        return true;
+                    }
+                }
+            }
+            None => return false,
+        }
+        false
     }
 }
 
 #[cfg(test)]
 mod test {
     use crate::config::Config;
+    use std::path::PathBuf;
 
     #[test]
     fn load_toml_not_exists() {
@@ -99,6 +118,10 @@ mod test {
         let item = result.clone().get_by_name("nvim".to_string()).unwrap();
         assert_eq!(item.name, "nvim");
         assert_eq!(result.name, "dottie_example");
-        assert_eq!(result.repo.unwrap(), "git@github.com:crispgm/dottie.git");
+        assert_eq!(
+            result.repo.clone().unwrap(),
+            "git@github.com:crispgm/dottie.git"
+        );
+        assert_eq!(result.is_dottied(PathBuf::from("./nvim")), true)
     }
 }
