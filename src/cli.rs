@@ -10,49 +10,45 @@ use crate::show_error;
 pub fn run() {
     let app = init_app();
 
-    let matches = app.get_matches();
+    let name;
     let mut err_code: i32 = 0;
-    // ls
+    let cmd: Box<dyn Command>;
+
+    let matches = app.get_matches();
     if let Some(ref _matches) = matches.subcommand_matches("ls") {
+        name = "ls";
         let cwd = get_cwd();
         let path = format!("{}/dottie.toml", cwd);
-        if let Err(e) = ls::ListOpt::new(path).run() {
-            show_error!("Running command on {} failed: {}", "ls", e);
-            err_code = 1;
-        }
-    }
-    // info
-    if let Some(ref matches) = matches.subcommand_matches("info") {
+        cmd = Box::new(ls::ListOpt::new(path));
+    } else if let Some(ref matches) = matches.subcommand_matches("info") {
+        name = "info";
         let cwd = get_cwd();
         let path = format!("{}/fixtures/dottie.toml", cwd);
         let name = matches.value_of("NAME").unwrap_or("");
-        if let Err(e) = info::InfoOpt::new(path, name.to_string()).run() {
-            show_error!("Running command on {} failed: {}", "info", e);
-            err_code = 1;
-        }
-    }
-    // init
-    if let Some(ref matches) = matches.subcommand_matches("init") {
+        cmd = Box::new(info::InfoOpt::new(path, name.to_string()));
+    } else if let Some(ref matches) = matches.subcommand_matches("init") {
+        name = "init";
         let git_repo = matches.value_of("git").unwrap_or("");
-        let init_opt = init::InitOpt::new(git_repo.to_string());
-        if let Err(e) = init_opt.run() {
-            show_error!("Running command on {} failed: {}", "init", e);
-            err_code = 1;
-        }
-    }
-    // add
-    if let Some(ref matches) = matches.subcommand_matches("add") {
+        cmd = Box::new(init::InitOpt::new(git_repo.to_string()));
+    } else if let Some(ref matches) = matches.subcommand_matches("add") {
+        name = "add";
         let cwd = get_cwd();
         let path = format!("{}/fixtures/dottie.toml", cwd);
         let name = matches.value_of("name").unwrap_or("");
         let src = matches.value_of("PATH").unwrap_or("");
-        let add_opt = add::AddOpt::new(path.to_string(), name.to_string(), src.to_string());
-        if let Err(e) = add_opt.run() {
-            show_error!("Running command on {} failed: {}", "add", e);
-            err_code = 1;
-        }
+        cmd = Box::new(add::AddOpt::new(
+            path.to_string(),
+            name.to_string(),
+            src.to_string(),
+        ));
+    } else {
+        return;
     }
 
+    if let Err(e) = cmd.as_ref().run() {
+        show_error!("Running command `{}` failed", name);
+        err_code = 1;
+    }
     process::exit(err_code);
 }
 
