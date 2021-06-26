@@ -1,10 +1,10 @@
 use std::error::Error;
-use std::fs::metadata;
 use std::path::PathBuf;
 
 use crate::commands::Command;
 use crate::config::{DotItem, DotType};
-use crate::show_info;
+use crate::fs::File;
+use crate::{show_error, show_info};
 
 pub struct AddOpt {
     name: String,
@@ -14,11 +14,6 @@ pub struct AddOpt {
 impl AddOpt {
     pub fn new(name: String, path: String) -> AddOpt {
         AddOpt { name, path }
-    }
-
-    fn is_dir(&self) -> bool {
-        let md = metadata(self.path.clone()).unwrap();
-        return md.is_dir();
     }
 }
 
@@ -32,15 +27,23 @@ impl Command for AddOpt {
             dot_type: DotType::File,
             symlinked: None,
         };
-        let is_dir = self.is_dir();
-        if is_dir {
+        // TODO: check whether target is dottied
+        let f = File::from_path(item.src.clone());
+        if f.is_symlink() {
+            show_error!(
+                "Source dotfile `{}` has been already a symbolic link",
+                self.path
+            )
+            // TODO: return the error
+        } else if f.is_dir() {
             show_info!("Adding directory => {}", self.path);
             item.dot_type = DotType::Dir;
-        } else {
+        } else if f.is_file() {
             show_info!("Adding file => {}", self.path);
+        } else {
+            // TODO: unknown
         }
         println!("{:?}", item);
-        // TODO: check whether target is dottied
         // TODO: do adding
         Ok(())
     }

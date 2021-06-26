@@ -5,3 +5,4 @@ mod macros;
 mod command;
 mod commands;
 mod config;
+mod fs;
