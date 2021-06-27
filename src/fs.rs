@@ -2,6 +2,7 @@ use std::fs::{metadata, FileType, Metadata};
 use std::path::PathBuf;
 
 pub struct File {
+    #[allow(dead_code)]
     path: PathBuf,
     md: Metadata,
 }
@@ -13,6 +14,7 @@ impl File {
         File { path: p, md }
     }
 
+    #[allow(dead_code)]
     pub fn file_type(&self) -> FileType {
         self.md.file_type()
     }
@@ -35,15 +37,21 @@ mod test {
     use crate::fs::File;
     use std::path::PathBuf;
 
-    #[cfg(test)]
+    #[test]
+    fn file_type() {
+        let f = File::from_path(PathBuf::from("./src/commands"));
+        assert_eq!(f.file_type().is_file(), false)
+    }
+
+    #[test]
     fn is_dir() {
-        let f = File::from_path(PathBuf::from("./commands"));
+        let f = File::from_path(PathBuf::from("./src/commands"));
         assert_eq!(f.is_dir(), true)
     }
 
-    #[cfg(test)]
+    #[test]
     fn is_file() {
-        let f = File::from_path(PathBuf::from("./fs.rs"));
+        let f = File::from_path(PathBuf::from("./src/fs.rs"));
         assert_eq!(f.is_file(), true)
     }
 }

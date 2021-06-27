@@ -52,12 +52,17 @@ dottie link
 
 - [ ] init
 - [ ] clone
+- [ ] check
 - [x] ls
 - [x] info
 - [ ] add
 - [ ] rm
 - [ ] link
 - [ ] unlink
+
+### Usage
+
+TODO: we will finish this chapter ASAP the commands are implemented.
 
 ## License
 

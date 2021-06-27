@@ -9,29 +9,31 @@ use crate::show_error;
 
 pub fn run() {
     let app = init_app();
-
-    let name;
-    let mut err_code: i32 = 0;
+    let cmd_name;
     let cmd: Box<dyn Command>;
 
     let matches = app.get_matches();
     if let Some(ref _matches) = matches.subcommand_matches("ls") {
-        name = "ls";
+        cmd_name = "ls";
         let cwd = get_cwd();
         let path = format!("{}/dottie.toml", cwd);
         cmd = Box::new(ls::ListOpt::new(path));
     } else if let Some(ref matches) = matches.subcommand_matches("info") {
-        name = "info";
+        cmd_name = "info";
         let cwd = get_cwd();
         let path = format!("{}/fixtures/dottie.toml", cwd);
         let name = matches.value_of("NAME").unwrap_or("");
         cmd = Box::new(info::InfoOpt::new(path, name.to_string()));
+    } else if let Some(ref matches) = matches.subcommand_matches("clone") {
+        cmd_name = "clone";
+        let name = matches.value_of("NAME").unwrap_or("");
+        cmd = Box::new(clone::CloneOpt::new(name.to_string()));
     } else if let Some(ref matches) = matches.subcommand_matches("init") {
-        name = "init";
+        cmd_name = "init";
         let git_repo = matches.value_of("git").unwrap_or("");
         cmd = Box::new(init::InitOpt::new(git_repo.to_string()));
     } else if let Some(ref matches) = matches.subcommand_matches("add") {
-        name = "add";
+        cmd_name = "add";
         let cwd = get_cwd();
         let path = format!("{}/fixtures/dottie.toml", cwd);
         let name = matches.value_of("name").unwrap_or("");
@@ -41,15 +43,20 @@ pub fn run() {
             name.to_string(),
             src.to_string(),
         ));
+    // } else if let Some(ref matches) = matches.subcommand_matches("link") {
+    } else if let Some(ref matches) = matches.subcommand_matches("unlink") {
+        cmd_name = "unlink";
+        let name = matches.value_of("name").unwrap_or("");
+        cmd = Box::new(unlink::UnlinkOpt::new(name.to_string()));
     } else {
         return;
     }
 
-    if let Err(e) = cmd.as_ref().run() {
-        show_error!("Running command `{}` failed", name);
-        err_code = 1;
+    if let Err(_e) = cmd.as_ref().run() {
+        // each command should show its own error message
+        show_error!("Running command `{}` failed", cmd_name);
+        process::exit(1);
     }
-    process::exit(err_code);
 }
 
 fn init_app() -> App<'static> {
