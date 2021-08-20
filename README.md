@@ -19,11 +19,13 @@ This might be used in any scenarios that requests similar functions.
 ### Installation
 
 Install with Homebrew:
+
 ```bash
 brew install crispgm/dottie/homebrew
 ```
 
 Install with Cargo:
+
 ```bash
 cargo install dottie
 ```

@@ -18,13 +18,20 @@ impl AddOpt {
     pub fn new(path: String, name: String, src: String) -> AddOpt {
         AddOpt { name, path, src }
     }
+
+    fn default_name(&self, src: PathBuf) -> String {
+        let mut name = self.name.clone();
+        if self.name.is_empty() {
+            // if name is not set, convert fn.ext to fn_ext
+            name = src.file_name().unwrap().to_str().unwrap().replace(".", "_");
+        }
+
+        name
+    }
 }
 
 impl Command for AddOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        if self.name.is_empty() {
-            // TODO: if name is "", then what to use?
-        }
         let cfg = Config::from_toml(self.path.clone()).unwrap();
         let src = PathBuf::from(self.src.clone());
         if cfg.is_dottied(src.clone()) {
@@ -32,7 +39,7 @@ impl Command for AddOpt {
             return Err(Box::new(SourceFileIsDottied));
         }
         let mut item = DotItem {
-            name: self.name.clone(),
+            name: self.default_name(src.clone()),
             src,
             target: PathBuf::from(self.path.clone()), // TODO: expand source and target
             dot_type: DotType::File,
@@ -81,3 +88,15 @@ impl fmt::Display for SourceFileIsDottied {
 }
 
 impl Error for SourceFileIsDottied {}
+
+#[cfg(test)]
+mod test {
+    use crate::commands::add::*;
+
+    #[test]
+    fn convert_to_default_name() {
+        let add = AddOpt::new(".".to_string(), "".to_string(), "./init.vim".to_string());
+        let def_name = add.default_name(PathBuf::from("init.vim"));
+        assert_eq!("init_vim", def_name);
+    }
+}
