@@ -93,11 +93,24 @@ impl Config {
         }
         false
     }
+
+    pub fn add(&mut self, item: DotItem) -> Result<(), Box<dyn Error>> {
+        match self.dotfiles {
+            Some(ref mut dotfiles) => dotfiles.push(item),
+            None => self.dotfiles = Some(vec![item]),
+        };
+
+        Ok(())
+    }
+
+    pub fn save(&self) -> Result<(), Box<dyn Error>> {
+        Ok(())
+    }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::config::Config;
+    use crate::config::*;
     use std::path::PathBuf;
 
     #[test]
@@ -123,5 +136,26 @@ mod test {
             "git@github.com:crispgm/dottie.git"
         );
         assert_eq!(result.is_dottied(PathBuf::from("./nvim")), true)
+    }
+
+    #[test]
+    fn add_to_conf() {
+        let mut dt = Config {
+            name: "test".to_string(),
+            repo: None,
+            description: None,
+            dotfiles: None,
+        };
+        let rs = dt
+            .add(DotItem {
+                name: "_test".to_string(),
+                dot_type: DotType::File,
+                src: PathBuf::from("abc"),
+                target: PathBuf::from(""),
+                symlinked: None,
+            })
+            .unwrap();
+        assert_eq!(rs, ());
+        assert_eq!(dt.is_dottied(PathBuf::from("abc")), true);
     }
 }

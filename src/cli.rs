@@ -11,17 +11,15 @@ pub fn run() {
     let app = init_app();
     let cmd_name;
     let cmd: Box<dyn Command>;
+    let cwd = get_cwd();
+    let path = format!("{}/dottie.toml", cwd);
 
     let matches = app.get_matches();
     if let Some(ref _matches) = matches.subcommand_matches("ls") {
         cmd_name = "ls";
-        let cwd = get_cwd();
-        let path = format!("{}/dottie.toml", cwd);
         cmd = Box::new(ls::ListOpt::new(path));
     } else if let Some(ref matches) = matches.subcommand_matches("info") {
         cmd_name = "info";
-        let cwd = get_cwd();
-        let path = format!("{}/fixtures/dottie.toml", cwd);
         let name = matches.value_of("NAME").unwrap_or("");
         cmd = Box::new(info::InfoOpt::new(path, name.to_string()));
     } else if let Some(ref matches) = matches.subcommand_matches("clone") {
@@ -34,8 +32,6 @@ pub fn run() {
         cmd = Box::new(init::InitOpt::new(git_repo.to_string()));
     } else if let Some(ref matches) = matches.subcommand_matches("add") {
         cmd_name = "add";
-        let cwd = get_cwd();
-        let path = format!("{}/fixtures/dottie.toml", cwd);
         let name = matches.value_of("name").unwrap_or("");
         let src = matches.value_of("PATH").unwrap_or("");
         cmd = Box::new(add::AddOpt::new(

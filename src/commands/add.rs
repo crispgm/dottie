@@ -32,10 +32,10 @@ impl AddOpt {
 
 impl Command for AddOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        let cfg = Config::from_toml(self.path.clone()).unwrap();
+        let mut cfg = Config::from_toml(self.path.clone()).unwrap();
         let src = PathBuf::from(self.src.clone());
         if cfg.is_dottied(src.clone()) {
-            show_error!("Source dotfile `{}` has already been dottied", self.path);
+            show_error!("Source dotfile `{}` has already been dottied", self.src);
             return Err(Box::new(SourceFileIsDottied));
         }
         let mut item = DotItem {
@@ -50,20 +50,25 @@ impl Command for AddOpt {
         if f.is_symlink() {
             show_error!(
                 "Source dotfile `{}` has been already a symbolic link",
-                self.path
+                self.src
             );
             return Err(Box::new(SymlinkSourceNotSupported));
         } else if f.is_dir() {
-            show_info!("Adding directory => {}", self.path);
+            show_info!("Adding directory => {}", self.src);
             item.dot_type = DotType::Dir;
         } else if f.is_file() {
-            show_info!("Adding file => {}", self.path);
+            show_info!("Adding file => {}", self.src);
         } else {
             // TODO: unknown
+            show_error!("Unknown file type `{}`", self.src);
         }
-        println!("{:?}", item);
-        // TODO: do adding
-        Ok(())
+
+        match cfg.add(item) {
+            Err(e) => return Err(e),
+            _ => (),
+        }
+        cfg.save()
+        // TODO: move the files
     }
 }
 
