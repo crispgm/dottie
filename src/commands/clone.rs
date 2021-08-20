@@ -8,8 +8,10 @@ pub struct CloneOpt {
 }
 
 impl CloneOpt {
-    pub fn new(git: String) -> CloneOpt {
-        CloneOpt { git }
+    pub fn new(git: &str) -> CloneOpt {
+        CloneOpt {
+            git: git.to_string(),
+        }
     }
 }
 

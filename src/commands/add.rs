@@ -15,11 +15,15 @@ pub struct AddOpt {
 }
 
 impl AddOpt {
-    pub fn new(path: String, name: String, src: String) -> AddOpt {
-        AddOpt { name, path, src }
+    pub fn new(path: &str, name: &str, src: &str) -> AddOpt {
+        AddOpt {
+            name: name.to_string(),
+            path: path.to_string(),
+            src: src.to_string(),
+        }
     }
 
-    fn default_name(&self, src: PathBuf) -> String {
+    fn default_name(&self, src: &PathBuf) -> String {
         let mut name = self.name.clone();
         if self.name.is_empty() {
             // if name is not set, convert fn.ext to fn_ext
@@ -32,21 +36,21 @@ impl AddOpt {
 
 impl Command for AddOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        let mut cfg = Config::from_toml(self.path.clone()).unwrap();
-        let src = PathBuf::from(self.src.clone());
-        if cfg.is_dottied(src.clone()) {
+        let mut cfg = Config::from_toml(&self.path).unwrap();
+        let src = PathBuf::from(&self.src);
+        if cfg.is_dottied(&src) {
             show_error!("Source dotfile `{}` has already been dottied", self.src);
             return Err(Box::new(SourceFileIsDottied));
         }
         let mut item = DotItem {
-            name: self.default_name(src.clone()),
+            name: self.default_name(&src),
             src,
-            target: PathBuf::from(self.path.clone()), // TODO: expand source and target
+            target: PathBuf::from(&self.path), // TODO: expand source and target
             dot_type: DotType::File,
             symlinked: None,
         };
         // TODO: check whether target is dottied
-        let f = File::from_path(item.src.clone());
+        let f = File::from_path(&item.src);
         if f.is_symlink() {
             show_error!(
                 "Source dotfile `{}` has been already a symbolic link",
@@ -100,8 +104,8 @@ mod test {
 
     #[test]
     fn convert_to_default_name() {
-        let add = AddOpt::new(".".to_string(), "".to_string(), "./init.vim".to_string());
-        let def_name = add.default_name(PathBuf::from("init.vim"));
+        let add = AddOpt::new(".", "", "./init.vim");
+        let def_name = add.default_name(&PathBuf::from("init.vim"));
         assert_eq!("init_vim", def_name);
     }
 }

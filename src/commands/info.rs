@@ -10,15 +10,18 @@ pub struct InfoOpt {
 }
 
 impl InfoOpt {
-    pub fn new(path: String, name: String) -> InfoOpt {
-        InfoOpt { path, name }
+    pub fn new(path: &str, name: &str) -> InfoOpt {
+        InfoOpt {
+            path: path.to_string(),
+            name: name.to_string(),
+        }
     }
 }
 
 impl Command for InfoOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
         show_info!("Show info => {}", self.name);
-        let cfg = Config::from_toml(self.path.clone()).unwrap();
+        let cfg = Config::from_toml(&self.path).unwrap();
         let item = cfg.get_by_name(self.name.to_string());
         match item {
             Some(di) => {

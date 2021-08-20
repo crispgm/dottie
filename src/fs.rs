@@ -2,16 +2,13 @@ use std::fs::{metadata, FileType, Metadata};
 use std::path::PathBuf;
 
 pub struct File {
-    #[allow(dead_code)]
-    path: PathBuf,
     md: Metadata,
 }
 
 impl File {
-    pub fn from_path(path: PathBuf) -> File {
-        let p = PathBuf::from(path);
-        let md = metadata(p.clone()).unwrap();
-        File { path: p, md }
+    pub fn from_path(path: &PathBuf) -> File {
+        let md = metadata(path).unwrap();
+        File { md }
     }
 
     #[allow(dead_code)]
@@ -39,19 +36,19 @@ mod test {
 
     #[test]
     fn file_type() {
-        let f = File::from_path(PathBuf::from("./src/commands"));
+        let f = File::from_path(&PathBuf::from("./src/commands"));
         assert_eq!(f.file_type().is_file(), false)
     }
 
     #[test]
     fn is_dir() {
-        let f = File::from_path(PathBuf::from("./src/commands"));
+        let f = File::from_path(&PathBuf::from("./src/commands"));
         assert_eq!(f.is_dir(), true)
     }
 
     #[test]
     fn is_file() {
-        let f = File::from_path(PathBuf::from("./src/fs.rs"));
+        let f = File::from_path(&PathBuf::from("./src/fs.rs"));
         assert_eq!(f.is_file(), true)
     }
 }

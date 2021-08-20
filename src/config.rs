@@ -44,7 +44,7 @@ impl Error for ConfigNotExisted {}
 
 impl Config {
     // load from `dottie.toml`
-    pub fn from_toml(path: String) -> Result<Config, Box<dyn Error>> {
+    pub fn from_toml(path: &str) -> Result<Config, Box<dyn Error>> {
         if !Path::new(&path).exists() {
             return Err(Box::new(ConfigNotExisted));
         }
@@ -80,11 +80,11 @@ impl Config {
         None
     }
 
-    pub fn is_dottied(&self, src: PathBuf) -> bool {
+    pub fn is_dottied(&self, src: &PathBuf) -> bool {
         match self.dotfiles.clone() {
             Some(dotfiles) => {
                 for item in dotfiles {
-                    if item.src == src {
+                    if item.src.eq(src) {
                         return true;
                     }
                 }
@@ -115,7 +115,7 @@ mod test {
 
     #[test]
     fn load_toml_not_exists() {
-        let e = Config::from_toml(String::from("/some/path/not/exists"))
+        let e = Config::from_toml("/some/path/not/exists")
             .unwrap_err()
             .to_string();
         assert_eq!(e.starts_with("Config is not existed"), true)
@@ -123,7 +123,7 @@ mod test {
 
     #[test]
     fn load_from_toml() {
-        let result = Config::from_toml(String::from("./fixtures/dottie.toml")).unwrap();
+        let result = Config::from_toml("./fixtures/dottie.toml").unwrap();
         assert_eq!(
             result.clone().brief(),
             "Name: dottie_example (Example dottie.toml)"
@@ -135,7 +135,7 @@ mod test {
             result.repo.clone().unwrap(),
             "git@github.com:crispgm/dottie.git"
         );
-        assert_eq!(result.is_dottied(PathBuf::from("./nvim")), true)
+        assert_eq!(result.is_dottied(&PathBuf::from("./nvim")), true)
     }
 
     #[test]
@@ -156,6 +156,6 @@ mod test {
             })
             .unwrap();
         assert_eq!(rs, ());
-        assert_eq!(dt.is_dottied(PathBuf::from("abc")), true);
+        assert_eq!(dt.is_dottied(&PathBuf::from("abc")), true);
     }
 }

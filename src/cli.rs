@@ -17,15 +17,15 @@ pub fn run() {
     let matches = app.get_matches();
     if let Some(ref _matches) = matches.subcommand_matches("ls") {
         cmd_name = "ls";
-        cmd = Box::new(ls::ListOpt::new(path));
+        cmd = Box::new(ls::ListOpt::new(&path));
     } else if let Some(ref matches) = matches.subcommand_matches("info") {
         cmd_name = "info";
         let name = matches.value_of("NAME").unwrap_or("");
-        cmd = Box::new(info::InfoOpt::new(path, name.to_string()));
+        cmd = Box::new(info::InfoOpt::new(&path, &name));
     } else if let Some(ref matches) = matches.subcommand_matches("clone") {
         cmd_name = "clone";
         let name = matches.value_of("NAME").unwrap_or("");
-        cmd = Box::new(clone::CloneOpt::new(name.to_string()));
+        cmd = Box::new(clone::CloneOpt::new(name));
     } else if let Some(ref matches) = matches.subcommand_matches("init") {
         cmd_name = "init";
         let git_repo = matches.value_of("git").unwrap_or("");
@@ -34,11 +34,7 @@ pub fn run() {
         cmd_name = "add";
         let name = matches.value_of("name").unwrap_or("");
         let src = matches.value_of("PATH").unwrap_or("");
-        cmd = Box::new(add::AddOpt::new(
-            path.to_string(),
-            name.to_string(),
-            src.to_string(),
-        ));
+        cmd = Box::new(add::AddOpt::new(&path, &name, &src));
     // } else if let Some(ref matches) = matches.subcommand_matches("link") {
     } else if let Some(ref matches) = matches.subcommand_matches("unlink") {
         cmd_name = "unlink";

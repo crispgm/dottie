@@ -10,8 +10,10 @@ pub struct ListOpt {
 }
 
 impl ListOpt {
-    pub fn new(path: String) -> ListOpt {
-        ListOpt { path }
+    pub fn new(path: &str) -> ListOpt {
+        ListOpt {
+            path: path.to_string(),
+        }
     }
 }
 
@@ -19,7 +21,7 @@ impl Command for ListOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
         show_info!("Listing repository => {}", self.path);
 
-        let cfg = Config::from_toml(self.path.clone()).unwrap_or_else(|err| {
+        let cfg = Config::from_toml(&self.path).unwrap_or_else(|err| {
             show_error!("{}", err);
             process::exit(1);
         });
@@ -34,7 +36,7 @@ impl Command for ListOpt {
 
 #[test]
 fn test_ls() {
-    let path = String::from("./fixtures/dottie.toml");
-    let opt: ListOpt = ListOpt::new(path.clone());
+    let path = "./fixtures/dottie.toml";
+    let opt: ListOpt = ListOpt::new(path);
     assert_eq!(opt.path, path)
 }
