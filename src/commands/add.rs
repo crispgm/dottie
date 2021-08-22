@@ -1,10 +1,10 @@
 use std::error::Error;
-use std::fmt;
 use std::path::PathBuf;
 
 use crate::commands::Command;
 use crate::config::Config;
 use crate::config::{DotItem, DotType};
+use crate::error::{SourceFileIsDottied, SymlinkSourceNotSupported, UnknownFileType};
 use crate::fs::File;
 use crate::{show_error, show_info};
 
@@ -63,8 +63,8 @@ impl Command for AddOpt {
         } else if f.is_file() {
             show_info!("Adding file => {}", self.src);
         } else {
-            // TODO: unknown
             show_error!("Unknown file type `{}`", self.src);
+            return Err(Box::new(UnknownFileType));
         }
 
         match cfg.add(item) {
@@ -75,28 +75,6 @@ impl Command for AddOpt {
         // TODO: move the files
     }
 }
-
-#[derive(Debug, Clone)]
-pub struct SymlinkSourceNotSupported;
-
-impl fmt::Display for SymlinkSourceNotSupported {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Source file cannot be a symbolic link")
-    }
-}
-
-impl Error for SymlinkSourceNotSupported {}
-
-#[derive(Debug, Clone)]
-pub struct SourceFileIsDottied;
-
-impl fmt::Display for SourceFileIsDottied {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Source file has already been dottied")
-    }
-}
-
-impl Error for SourceFileIsDottied {}
 
 #[cfg(test)]
 mod test {
