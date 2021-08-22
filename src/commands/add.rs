@@ -24,30 +24,30 @@ impl AddOpt {
     }
 
     fn default_name(&self, src: &PathBuf) -> String {
-        let mut name = self.name.clone();
         if self.name.is_empty() {
             // if name is not set, convert fn.ext to fn_ext
-            name = src.file_name().unwrap().to_str().unwrap().replace(".", "_");
+            let name = src.file_name().unwrap().to_str().unwrap().replace(".", "_");
+            return name;
         }
 
-        name
+        self.name.to_string()
     }
 }
 
 impl Command for AddOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
-        let mut cfg = Config::from_toml(&self.path).unwrap();
+        let mut cfg = Config::from_toml(&PathBuf::from(&self.path)).unwrap();
         let src = PathBuf::from(&self.src);
         if cfg.is_dottied(&src) {
             show_error!("Source dotfile `{}` has already been dottied", self.src);
             return Err(Box::new(SourceFileIsDottied));
         }
         let mut item = DotItem {
-            name: self.default_name(&src),
+            name: self.default_name(&src).to_string(),
             src,
             target: PathBuf::from(&self.path), // TODO: expand source and target
             dot_type: DotType::File,
-            symlinked: None,
+            symlinked: false,
         };
         // TODO: check whether target is dottied
         let f = File::from_path(&item.src);

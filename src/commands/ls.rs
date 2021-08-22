@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::path::PathBuf;
 use std::process;
 
 use crate::commands::Command;
@@ -21,13 +22,13 @@ impl Command for ListOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
         show_info!("Listing repository => {}", self.path);
 
-        let cfg = Config::from_toml(&self.path).unwrap_or_else(|err| {
+        let cfg = Config::from_toml(&PathBuf::from(&self.path)).unwrap_or_else(|err| {
             show_error!("{}", err);
             process::exit(1);
         });
 
         show_info!("{}", cfg.brief());
-        for item in cfg.dotfiles.unwrap().iter() {
+        for item in cfg.dotfiles.iter() {
             show_info!("\t- {}", item.name);
         }
         Ok(())

@@ -35,7 +35,7 @@ pub fn run() {
         let name = matches.value_of("name").unwrap_or("");
         let src = matches.value_of("PATH").unwrap_or("");
         cmd = Box::new(add::AddOpt::new(&path, &name, &src));
-    // } else if let Some(ref matches) = matches.subcommand_matches("link") {
+        // } else if let Some(ref matches) = matches.subcommand_matches("link") {
     } else if let Some(ref matches) = matches.subcommand_matches("unlink") {
         cmd_name = "unlink";
         let name = matches.value_of("name").unwrap_or("");

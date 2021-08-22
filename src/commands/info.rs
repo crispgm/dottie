@@ -1,4 +1,5 @@
 use std::error::Error;
+use std::path::PathBuf;
 
 use crate::commands::Command;
 use crate::config::Config;
@@ -21,11 +22,11 @@ impl InfoOpt {
 impl Command for InfoOpt {
     fn run(&self) -> Result<(), Box<dyn Error>> {
         show_info!("Show info => {}", self.name);
-        let cfg = Config::from_toml(&self.path).unwrap();
+        let cfg = Config::from_toml(&PathBuf::from(&self.path)).unwrap();
         let item = cfg.get_by_name(self.name.to_string());
         match item {
             Some(di) => {
-                if di.symlinked.is_some() && di.symlinked.unwrap() {
+                if di.symlinked {
                     show_info!("{} ✅", di.name);
                 } else {
                     show_info!("{}", di.name);

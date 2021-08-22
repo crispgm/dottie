@@ -14,21 +14,19 @@ pub enum DotType {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DotItem {
     pub name: String,
-
     #[serde(rename = "dt")]
     pub dot_type: DotType,
     pub src: PathBuf,
     pub target: PathBuf,
-
-    pub symlinked: Option<bool>,
+    pub symlinked: bool,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Config {
     pub name: String,
-    pub repo: Option<String>,
-    pub description: Option<String>,
-    pub dotfiles: Option<Vec<DotItem>>,
+    pub repo: String,
+    pub description: String,
+    pub dotfiles: Vec<DotItem>,
 }
 
 #[derive(Debug, Clone)]
@@ -44,7 +42,7 @@ impl Error for ConfigNotExisted {}
 
 impl Config {
     // load from `dottie.toml`
-    pub fn from_toml(path: &str) -> Result<Config, Box<dyn Error>> {
+    pub fn from_toml(path: &PathBuf) -> Result<Config, Box<dyn Error>> {
         if !Path::new(&path).exists() {
             return Err(Box::new(ConfigNotExisted));
         }
@@ -55,50 +53,33 @@ impl Config {
     }
 
     pub fn brief(&self) -> String {
-        if self.description.is_some() {
-            format!(
-                "Name: {} ({})",
-                self.name,
-                self.description.clone().unwrap()
-            )
-        } else {
+        if self.description.is_empty() {
             format!("Name: {}", self.name)
+        } else {
+            format!("Name: {} ({})", self.name, self.description,)
         }
     }
 
     pub fn get_by_name(&self, name: String) -> Option<DotItem> {
-        match self.dotfiles.clone() {
-            Some(dotfiles) => {
-                for item in dotfiles {
-                    if item.name == name {
-                        return Some(item);
-                    }
-                }
+        for item in self.dotfiles.iter() {
+            if item.name == name {
+                return Some(item.clone());
             }
-            None => (),
         }
         None
     }
 
     pub fn is_dottied(&self, src: &PathBuf) -> bool {
-        match self.dotfiles.clone() {
-            Some(dotfiles) => {
-                for item in dotfiles {
-                    if item.src.eq(src) {
-                        return true;
-                    }
-                }
+        for item in self.dotfiles.iter() {
+            if item.src.eq(src) {
+                return true;
             }
-            None => return false,
         }
         false
     }
 
     pub fn add(&mut self, item: DotItem) -> Result<(), Box<dyn Error>> {
-        match self.dotfiles {
-            Some(ref mut dotfiles) => dotfiles.push(item),
-            None => self.dotfiles = Some(vec![item]),
-        };
+        self.dotfiles.push(item);
 
         Ok(())
     }
@@ -115,7 +96,7 @@ mod test {
 
     #[test]
     fn load_toml_not_exists() {
-        let e = Config::from_toml("/some/path/not/exists")
+        let e = Config::from_toml(&PathBuf::from("/some/path/not/exists"))
             .unwrap_err()
             .to_string();
         assert_eq!(e.starts_with("Config is not existed"), true)
@@ -123,18 +104,12 @@ mod test {
 
     #[test]
     fn load_from_toml() {
-        let result = Config::from_toml("./fixtures/dottie.toml").unwrap();
-        assert_eq!(
-            result.clone().brief(),
-            "Name: dottie_example (Example dottie.toml)"
-        );
-        let item = result.clone().get_by_name("nvim".to_string()).unwrap();
+        let result = Config::from_toml(&PathBuf::from("./fixtures/dottie.toml")).unwrap();
+        assert_eq!(result.brief(), "Name: dottie_example (Example dottie.toml)");
+        let item = result.get_by_name("nvim".to_string()).unwrap();
         assert_eq!(item.name, "nvim");
         assert_eq!(result.name, "dottie_example");
-        assert_eq!(
-            result.repo.clone().unwrap(),
-            "git@github.com:crispgm/dottie.git"
-        );
+        assert_eq!(result.repo, "git@github.com:crispgm/dottie.git");
         assert_eq!(result.is_dottied(&PathBuf::from("./nvim")), true)
     }
 
@@ -142,9 +117,9 @@ mod test {
     fn add_to_conf() {
         let mut dt = Config {
             name: "test".to_string(),
-            repo: None,
-            description: None,
-            dotfiles: None,
+            repo: "".to_string(),
+            description: "".to_string(),
+            dotfiles: vec![],
         };
         let rs = dt
             .add(DotItem {
@@ -152,7 +127,7 @@ mod test {
                 dot_type: DotType::File,
                 src: PathBuf::from("abc"),
                 target: PathBuf::from(""),
-                symlinked: None,
+                symlinked: false,
             })
             .unwrap();
         assert_eq!(rs, ());
