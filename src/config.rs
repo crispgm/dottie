@@ -60,10 +60,10 @@ impl Config {
         }
     }
 
-    pub fn get_by_name(&self, name: String) -> Option<DotItem> {
+    pub fn get_by_name(&self, name: String) -> Option<&DotItem> {
         for item in self.dotfiles.iter() {
             if item.name == name {
-                return Some(item.clone());
+                return Some(item);
             }
         }
         None
